@@ -1,0 +1,226 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.IO;
+class MainClass
+{
+    static void Main()
+    {
+        while (true)
+        {
+            Console.WriteLine("1: Household Customers");
+            Console.WriteLine("2: Administrative Agency");
+            Console.WriteLine("3: Manufacturer");
+            Console.WriteLine("4: Business Service");
+            Console.Write("Choose an option (1/2/3/4): ");
+            string choice = Console.ReadLine() ?? "";
+            switch (choice)
+            {
+                case "1":
+                    Bill.bill_Water_1();
+                    break;
+                case "2":
+                    Bill.bill_Water_2();
+                    break;
+                case "3":
+                    Bill.bill_Water_3();
+                    break;
+                case "4":
+                    Bill.bill_Water_4();
+                    break;
+                default:
+                    Console.WriteLine("Invalid option.");
+                    continue;
+            }
+        }
+
+    }
+}
+class Name
+{
+    static List<string> customerNames = new List<string>();
+    public static string Name_households()
+    {
+        while (true)
+        {
+            Console.Write("Please enter your name: ");
+            string name_1 = Console.ReadLine() ?? "";
+            if (Check_Name_1(name_1))
+            {
+                return name_1;
+            }
+            else
+                Console.WriteLine("Name should only contain alphabets. Please re-enter your name.");
+        }
+
+    }
+    static bool Check_Name_1(string name_1)
+    {
+        return Regex.IsMatch(name_1, @"^.*[\p{L}\s]+.*$");
+    }
+    public static int number_of_users()
+    {
+        while (true)
+        {
+            try
+            {
+                Console.Write("Please enter the number of people in your family: ");
+                int n = Convert.ToInt32(Console.ReadLine());
+                if (n <= 0)
+                { Console.WriteLine("The minimum number of people in the family must be 1"); }
+                else
+                    return n;
+            }
+            catch
+            {
+                Console.WriteLine("Please enter a valid number");
+            }
+
+        }
+    }
+    public static string Name_Administrative_agency__Manufacturer__Business_service()
+    {
+        while (true)
+        {
+            Console.Write("Name : ");
+            string name_2 = Console.ReadLine() ?? "";
+
+            if (Check_Name_2(name_2))
+                return name_2;
+            else
+                Console.WriteLine("Invalid input. The name must contain only letters and numbers. Please re-enter.");
+        }
+    }
+    static bool Check_Name_2(string name_2)
+    {
+        return Regex.IsMatch(name_2, @"^.*[a-zA-Z0-9\s]+.*$");
+    }
+}
+class Water_fee
+{
+    public static (double, double) Water_quantity_last_now()
+    {
+        while (true)
+        {
+            try
+            {
+                Console.Write("Enter the amount of water last month: ");
+                Double A = Convert.ToDouble(Console.ReadLine()); // Water_quantity_last = A
+                Console.Write("Enter this month's water quantity: ");
+                Double B = Convert.ToDouble(Console.ReadLine());  // Water_quantity_now = B
+                if (A < 0 || B < 0)
+                {
+                    Console.WriteLine("The amount of water must be greater than 0");
+                }
+                else if (A > B)
+                {
+                    Console.WriteLine("The amount of water this month must be greater than or equal to the amount of water last month.");
+                }
+                else
+                    return (A, B);
+
+            }
+            catch
+            {
+                Console.WriteLine("Please enter a valid value.");
+            }
+        }
+    }
+    public static (double, double, double, double) Water_fee_1()
+    {
+        (double A, double B) = Water_quantity_last_now();
+        int n = Name.number_of_users();
+        double U1 = B - A;
+        double C1 = (U1) / n;
+        double M1;
+        if (C1 >= 0 && C1 < 10)
+        {
+            M1 = U1 * 5973;
+        }
+        else if (C1 >= 10 && C1 < 20)
+        {
+            M1 = U1 * 7052;
+        }
+        else if (C1 >= 20 && C1 < 30)
+        {
+            M1 = U1 * 8699;
+        }
+        else
+        {
+            M1 = U1 * 22068;
+        }
+        double VAT = M1 * 0.1;
+        double T1 = M1 + VAT;
+        return (U1, M1, VAT, T1);
+    }
+    public static (double, double, double, double) Water_fee_2()
+    {
+        (double A, double B) = Water_quantity_last_now();
+        double U2 = B - A;
+        double M2 = U2 * 9955;
+        double VAT = M2 * 0.1;
+        double T2 = M2 + VAT;
+        return (U2, M2, VAT, T2);
+    }
+    public static (double, double, double, double) Water_fee_3()
+    {
+        (double A, double B) = Water_quantity_last_now();
+        double U3 = B - A;
+        double M3 = U3 * 11615;
+        double VAT = M3 * 0.1;
+        double T3 = M3 + VAT;
+        return (U3, M3, VAT, T3);
+    }
+    public static (double, double, double, double) Water_fee_4()
+    {
+        (double A, double B) = Water_quantity_last_now();
+        double U4 = B - A;
+        double M4 = U4 * 22068;
+        double VAT = M4 * 0.1;
+        double T4 = M4 + VAT;
+        return (U4, M4, VAT, T4);
+    }
+}
+class Bill
+{
+    public static void bill_shared(string customerType, string customerName, double waterConsumed, double waterFee, double VAT, double totalAmount)
+    {
+        Console.WriteLine("");
+        Console.WriteLine("----------------------- Invoice -----------------------");
+        Console.WriteLine($"Customer Type: {customerType}");
+        Console.WriteLine($"Customer Name: {customerName}");
+        Console.WriteLine($"Amount of water consumed: {waterConsumed}m3");
+        Console.WriteLine($"Water money: {waterFee:N} VND");
+        Console.WriteLine($"VAT(10%): {VAT:N} VND");
+        Console.WriteLine($"Total money payable:: {totalAmount:N} VND");
+        Console.WriteLine("-------------------------------------------------------");
+        Console.WriteLine("");
+    }
+    public static void bill_Water_1()
+    {
+        string name_1 = Name.Name_households();
+        (double U1, double M1, double VAT, double T1) = Water_fee.Water_fee_1();
+        bill_shared($"Household Customers", name_1, U1, M1, VAT, T1);
+    }
+    public static void bill_Water_2()
+    {
+        Console.WriteLine("Please enter the name of the Administrative Agency!");
+        string name_2 = Name.Name_Administrative_agency__Manufacturer__Business_service();
+        (double U2, double M2, double VAT, double T2) = Water_fee.Water_fee_2();
+        bill_shared($"Household Customers", name_2, U2, M2, VAT, T2);
+    }
+    public static void bill_Water_3()
+    {
+        Console.WriteLine("Please enter the name of the Manufacturer!");
+        string name_2 = Name.Name_Administrative_agency__Manufacturer__Business_service();
+        (double U3, double M3, double VAT, double T3) = Water_fee.Water_fee_3();
+        bill_shared($"Household Customers", name_2, U3, M3, VAT, T3);
+    }
+    public static void bill_Water_4()
+    {
+        Console.WriteLine("Please enter the name of the Business Service!");
+        string name_2 = Name.Name_Administrative_agency__Manufacturer__Business_service();
+        (double U4, double M4, double VAT, double T4) = Water_fee.Water_fee_4();
+        bill_shared($"Business Service", name_2, U4, M4, VAT, T4);
+    }
+}
