@@ -1,3 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Numerics;
+using System.Security.Policy;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.DataFormats;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
 namespace WinFormsApp10
 {
     public partial class Funtion : Form
@@ -25,28 +41,29 @@ namespace WinFormsApp10
             txtTypeCustomer.Text = null;
             txtLastMonthWater.Text = null;
             txtThisMonthWater.Text = null;
+            txtMessage.Text = null;
+            lsvMessage.Items.Clear();
         }
-        // Example method where you want to assign the values
         private void btnGetBill_Click(object sender, EventArgs e)
         {
             string name = txtName.Text.Trim();
-            string customerType = txtTypeCustomer.Text.Trim().ToLower();
+            string customerType = txtTypeCustomer.Text.Trim();
             string member = txtMembers.Text.Trim();
             string lastWater = txtLastMonthWater.Text.Trim();
             string thisWater = txtThisMonthWater.Text.Trim();
             bool first = false;
             bool second = false;
-            if (customerType.Equals("household customer"))
+            if (customerType.Equals("Household Customer"))
             {
-                if (name != "" && checkName1(name))
+                if (name != "" && checkName1(name)) //   Object-Oriented
                 {
                     if (member != "" && int.TryParse(member, out int memberValue))
                     {
-                        if(memberValue > 0)
+                        if (memberValue > 0)
                         {
                             first = true;
                         }
-                        else 
+                        else
                         {
                             MessageBox.Show("Number of members must be greater than zero!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
@@ -60,7 +77,7 @@ namespace WinFormsApp10
                         MessageBox.Show("The number of family members must be an integer!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
-                else if(name == "")
+                else if (name == "")
                 {
                     MessageBox.Show("The customer name cannot be left blank!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -69,12 +86,12 @@ namespace WinFormsApp10
                     MessageBox.Show("Please enter a valid name!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            else if (customerType.Equals("administrative agency") || customerType.Equals("production units") || customerType.Equals("business services"))
+            else if (customerType.Equals("Administrative Agency") || customerType.Equals("Production Units") || customerType.Equals("Business Services"))
             {
                 if (name != "" && !checkName2(name))
                 {
                     MessageBox.Show("Please enter a valid name!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                } // 	Object-Oriented
                 else if (name == "")
                 {
                     MessageBox.Show("The customer name cannot be left blank!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -87,16 +104,16 @@ namespace WinFormsApp10
             else if (customerType == "")
             {
                 MessageBox.Show("The customer type cannot be left blank!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            } 
             else
             {
                 MessageBox.Show("Please select the correct customer type!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             if (first == true)
             {
-                if (lastWater != "" && thisWater != "" &&  int.TryParse(lastWater, out int lastWaterValue) && int.TryParse(thisWater, out int thisWaterValue))
+                if (lastWater != "" && thisWater != "" && int.TryParse(lastWater, out int lastWaterValue) && int.TryParse(thisWater, out int thisWaterValue))
                 {
-                    if(thisWaterValue >= lastWaterValue)
+                    if (thisWaterValue >= lastWaterValue)
                     {
                         second = true;
                     }
@@ -117,35 +134,39 @@ namespace WinFormsApp10
             if (second == true)
             {
                 var billGet = Calculator(customerType, member, lastWater, thisWater);
+                txtMessage.Enabled = true;
+                txtMessage.Text = $"Customer name:" + $"   {name}\r\n";
+                txtMessage.Text += $"Customer Type:" + $"   {customerType}\r\n";
                 lsvMessage.Enabled = true;
                 lsvMessage.Items.Clear();
+                // Create an invoice using listview
                 lsvMessage.View = View.Details;
-                lsvMessage.Columns.Add("Property", 200);
+                lsvMessage.Columns.Add("Property", 150);
                 lsvMessage.Columns.Add("Value", 200);
-
-                // Tạo các mục trong ListView
+                
+                ListViewItem nameCustomer = new ListViewItem("");
                 ListViewItem waterUsageItem = new ListViewItem("Water Usage");
-                waterUsageItem.SubItems.Add(billGet.Item1.ToString());
-                lsvMessage.Items.Add(waterUsageItem);
-
                 ListViewItem waterChargeItem = new ListViewItem("Water Charge");
-                waterChargeItem.SubItems.Add(billGet.Item2.ToString());
-                lsvMessage.Items.Add(waterChargeItem);
-
                 ListViewItem vatItem = new ListViewItem("VAT");
-                vatItem.SubItems.Add(billGet.Item3.ToString());
-                lsvMessage.Items.Add(vatItem);
-
                 ListViewItem totalBillItem = new ListViewItem("Total Bill");
-                totalBillItem.SubItems.Add(billGet.Item4.ToString());
+                
+                waterUsageItem.SubItems.Add(billGet.Item1.ToString() + "  m3");
+                waterChargeItem.SubItems.Add(billGet.Item2.ToString("N2") + "  VND");
+                vatItem.SubItems.Add(billGet.Item3.ToString("N2") + "  VND");
+                totalBillItem.SubItems.Add(billGet.Item4.ToString("N2") + "  VND");
+                
+                lsvMessage.Items.Add(waterUsageItem);
+                lsvMessage.Items.Add(waterChargeItem);
+                lsvMessage.Items.Add(vatItem);
                 lsvMessage.Items.Add(totalBillItem);
+                btnPay.Enabled = true;
             }
         }
         static bool checkName1(string customerName)
         {
             return Regex.IsMatch(customerName, @"^[a-zA-Z\s]*$");
-        }
-        static bool checkName2(string customerName)
+        } // “name” check condition if the customer is Household Customer
+        static bool checkName2(string customerName)  // “name” checks the condition if the customer is Administrative Agency, Production Units, Business Services
         {
             return Regex.IsMatch(customerName, @"^[a-zA-Z0-9\s]*$");
         }
@@ -157,7 +178,7 @@ namespace WinFormsApp10
             double waterMoney;
             double VAT;
             double totalBillHouseholdCustomer;
-            if (customerType.Equals("household customer"))
+            if (customerType.Equals("Household Customer"))
             {
                 int memberValue = Convert.ToInt32(member);
                 waterUser = thisWaterValue - lastWaterValue;
@@ -182,7 +203,7 @@ namespace WinFormsApp10
                 totalBillHouseholdCustomer = waterMoney + VAT;
                 return (waterUser, waterMoney, VAT, totalBillHouseholdCustomer);
             }
-            else if (customerType.Equals("administrative agency"))
+            else if (customerType.Equals("Administrative Agency"))
             {
                 waterUser = thisWaterValue - lastWaterValue;
                 waterMoney = waterUser * 9955;
@@ -190,7 +211,7 @@ namespace WinFormsApp10
                 totalBillHouseholdCustomer = waterMoney + VAT;
                 return (waterUser, waterMoney, VAT, totalBillHouseholdCustomer);
             }
-            else if (customerType.Equals("production units"))
+            else if (customerType.Equals("Production Units"))
             {
                 waterUser = thisWaterValue - lastWaterValue;
                 waterMoney = waterUser * 11615;
@@ -198,7 +219,7 @@ namespace WinFormsApp10
                 totalBillHouseholdCustomer = waterMoney + VAT;
                 return (waterUser, waterMoney, VAT, totalBillHouseholdCustomer);
             }
-            else if (customerType.Equals("business services"))
+            else if (customerType.Equals("Business Services"))
             {
                 waterUser = thisWaterValue - lastWaterValue;
                 waterMoney = waterUser * 22068;
@@ -217,15 +238,16 @@ namespace WinFormsApp10
         private void txtTypeCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
             string customerType = txtTypeCustomer.Text.Trim().ToLower();
-            if(customerType.Equals("household customer"))
+            if (customerType.Equals("household customer"))
             {
                 txtMembers.Enabled = true;
             }
-            else
-            {
-                txtMembers.Enabled = false;
-                txtMembers.Text = null;
-            }
+        }
+        private void btnPay_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            PayPage payPage = new PayPage();
+            payPage.ShowDialog();
         }
     }
 }
